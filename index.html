@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Name Guesser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ffae00;
+            }
+            to {
+                text-shadow: 0 0 20px #ffae00;
+            }
+        }
+
+        .container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .stage, #result, #feedback {
+            display: none;
+        }
+
+        .stage.active, #result.active, #feedback.active {
+            display: block;
+        }
+
+        .options button, .feedback button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1.2em;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .options button:hover, .feedback button:hover {
+            background-color: #0056b3;
+        }
+
+        #cheatCode {
+            margin-top: 20px;
+        }
+
+        #feedbackForm {
+            text-align: left;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AI Name Guesser</h1>
+    
+    <div class="container">
+        <!-- Stages -->
+        <div class="stage active" id="stage1">
+            <h2>What is the gender?</h2>
+            <div class="options">
+                <button onclick="nextStage('gender', 'male')">Male</button>
+                <button onclick="nextStage('gender', 'female')">Female</button>
+            </div>
+        </div>
+
+        <div class="stage" id="stage2">
+            <h2>Is the person in the school group?</h2>
+            <div class="options">
+                <button onclick="nextStage('schoolGroup', 'yes')">Yes</button>
+                <button onclick="nextStage('schoolGroup', 'no')">No</button>
+            </div>
+        </div>
+
+        <div class="stage" id="stage3">
+            <h2>Does the person wear spectacles?</h2>
+            <div class="options">
+                <button onclick="nextStage('spectacles', 'yes')">Yes</button>
+                <button onclick="nextStage('spectacles', 'no')">No</button>
+            </div>
+        </div>
+
+        <div class="stage" id="stage4">
+            <h2>Does the person have an Instagram account?</h2>
+            <div class="options">
+                <button onclick="nextStage('instagram', 'yes')">Yes</button>
+                <button onclick="nextStage('instagram', 'no')">No</button>
+            </div>
+        </div>
+
+        <div class="stage" id="stage5">
+            <h2>Does the person play any games?</h2>
+            <div class="options">
+                <button onclick="nextStage('games', 'PUBG')">PUBG</button>
+                <button onclick="nextStage('games', 'Free Fire')">Free Fire</button>
+                <button onclick="nextStage('games', 'No Games')">No Games</button>
+            </div>
+        </div>
+
+        <div class="stage" id="stage6">
+            <h2>Where does the person live?</h2>
+            <div class="options">
+                <button onclick="nextStage('location', 'Salahpur')">Salahpur</button>
+                <button onclick="nextStage('location', 'Nunu Babu Chowk')">Nunu Babu Chowk</button>
+                <button onclick="nextStage('location', 'Mannipur')">Mannipur</button>
+                <button onclick="nextStage('location', 'Rahimpur')">Rahimpur</button>
+                <button onclick="nextStage('location', 'Hajipur')">Hajipur</button>
+            </div>
+        </div>
+
+        <div class="stage" id="stage7">
+            <h2>Does the person have a nickname?</h2>
+            <div class="options">
+                <button onclick="nextStage('nickname', 'Raj')">Raj</button>
+                <button onclick="nextStage('nickname', 'Kissu')">Kissu</button>
+                <button onclick="nextStage('nickname', 'Sahil')">Sahil</button>
+                <button onclick="nextStage('nickname', 'Chattpat')">Chattpat</button>
+                <button onclick="nextStage('nickname', 'None')">None</button>
+            </div>
+        </div>
+
+        <!-- Final Result Section -->
+        <div id="result">
+            <h2>Congratulations!</h2>
+            <p>The person is <strong id="personName"></strong></p>
+        </div>
+
+        <!-- Feedback Section -->
+        <div id="feedback">
+            <h3>We couldn't find the person! Please provide feedback:</h3>
+            <form id="feedbackForm">
+                <label for="nameList">Choose the candidates:</label><br>
+                <input type="checkbox" name="candidate" value="Sachi"> Sachi<br>
+                <input type="checkbox" name="candidate" value="Aditya Raj"> Aditya Raj<br>
+                <input type="checkbox" name="candidate" value="Sahil"> Sahil<br>
+                <input type="checkbox" name="candidate" value="Prashant"> Prashant<br>
+                <input type="checkbox" name="candidate" value="Anshu Raj"> Anshu Raj<br>
+                <input type="checkbox" name="candidate" value="Ayush"> Ayush<br><br>
+                <label for="feedbackText">Feedback:</label><br>
+                <textarea id="feedbackText" rows="4" placeholder="Enter your feedback here"></textarea><br>
+                <button type="button" onclick="submitFeedback()">Submit Feedback</button>
+            </form>
+        </div>
+
+        <!-- Cheat Code Input -->
+        <div id="cheatCode">
+            <h3>Have a cheat code?</h3>
+            <input type="text" id="cheatInput" placeholder="Enter cheat code">
+            <button onclick="applyCheatCode()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        let answers = {}; // To store answers
+        let questionOrder = []; // To manage random question sequence
+        let allQuestions = [
+            'gender', 'schoolGroup', 'spectacles', 'instagram', 'games', 'location', 'nickname'
+        ];
+
+        // List of people with their attributes
+        const people = [
+            { name: 'Sachi', gender: 'female', schoolGroup: 'yes', spectacles: 'no', instagram: 'no', location: 'Not', siblings: '1', nickname: 'None', games: 'No Games', cheatCode: 'AIR HOSTESS' },
+            { name: 'Aditya Raj', gender: 'male', schoolGroup: 'yes', spectacles: 'yes', instagram: 'no', location: 'Salahpur', siblings: '3', nickname: 'None', games: 'No Games', cheatCode: 'BUDHAU' },
+            { name: 'Sahil', gender: 'male', schoolGroup: 'yes', spectacles: 'no', instagram: 'yes', location: 'Nunu Babu Chowk', siblings: '2 or 3', nickname: 'Raj', games: 'PUBG', cheatCode: 'SONA' },
+            { name: 'Prashant', gender: 'male', schoolGroup: 'yes', spectacles: 'no', instagram: 'yes', location: 'Mannipur', siblings: '1', nickname: 'Kissu', games: 'No Games', cheatCode: 'KISSU' },
+            { name: 'Anshu Raj', gender: 'male', schoolGroup: 'yes', spectacles: 'no', instagram: 'yes', location: 'Rahimpur', siblings: '1', nickname: 'Sahil', games: 'Free Fire', cheatCode: 'MONITOR' },
+            { name: 'Ayush', gender: 'male', schoolGroup: 'yes', spectacles: 'no', instagram: 'yes', location: 'Hajipur', siblings: '1', nickname: 'None', games: 'Free Fire', cheatCode: '0909' }
+        ];
+
+        function initQuestionOrder() {
+            questionOrder = [...allQuestions];
+            questionOrder.sort(() => Math.random() - 0.5);
+        }
+
+        function nextStage(question, answer) {
+            answers[question] = answer;
+
+            let currentStage = document.querySelector('.stage.active');
+            currentStage.classList.remove('active');
+
+            let nextStage = currentStage.nextElementSibling;
+            while (nextStage && !nextStage.classList.contains('stage')) {
+                nextStage = nextStage.nextElementSibling;
+            }
+
+            if (nextStage) {
+                nextStage.classList.add('active');
+            } else {
+                checkAnswers();
+            }
+        }
+
+        function nota() {
+            let currentStage = document.querySelector('.stage.active');
+            currentStage.classList.remove('active');
+
+            let nextStage = currentStage.nextElementSibling;
+            while (nextStage && !nextStage.classList.contains('stage')) {
+                nextStage = nextStage.nextElementSibling;
+            }
+
+            if (nextStage) {
+                nextStage.classList.add('active');
+            }
+        }
+
+        function checkAnswers() {
+            let matchedPeople = people.filter(person => {
+                let matchCount = 0;
+                Object.keys(answers).forEach(key => {
+                    if (person[key] === answers[key]) {
+                        matchCount++;
+                    }
+                });
+                return matchCount >= Object.keys(answers).length - 2; // Allow up to 2 wrong answers
+            });
+
+            if (matchedPeople.length === 1) {
+                document.getElementById('personName').innerText = matchedPeople[0].name;
+                document.getElementById('result').classList.add('active');
+            } else {
+                document.getElementById('feedback').classList.add('active');
+            }
+        }
+
+        function submitFeedback() {
+            let feedbackForm = document.getElementById('feedbackForm');
+            let selectedCandidates = Array.from(feedbackForm.querySelectorAll('input[name="candidate"]:checked')).map(checkbox => checkbox.value);
+            let feedbackText = document.getElementById('feedbackText').value;
+
+            // Send feedback data
+            console.log('Selected Candidates:', selectedCandidates);
+            console.log('Feedback:', feedbackText);
+
+            // Clear and hide feedback form
+            feedbackForm.reset();
+            document.getElementById('feedback').classList.remove('active');
+            document.querySelector('#stage1').classList.add('active');
+            answers = {};
+            initQuestionOrder();
+        }
+
+        function applyCheatCode() {
+            let cheatCode = document.getElementById('cheatInput').value;
+            let matchedPeople = people.filter(person => person.cheatCode === cheatCode);
+
+            if (matchedPeople.length === 1) {
+                document.getElementById('personName').innerText = matchedPeople[0].name;
+                document.getElementById('result').classList.add('active');
+            } else {
+                alert('Invalid cheat code or no match found.');
+            }
+        }
+
+        initQuestionOrder(); // Initialize question order on page load
+    </script>
+</body>
+</html>
